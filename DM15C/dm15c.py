@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This script onlye makes sense to people that own a DM-15C from
-# http://www.rpn-calc.ch/ a HP 15C clone that enabled very basic
+# This script only makes sense to people owning a DM-15C from
+# http://www.rpn-calc.ch/ a HP 15C clone that enables very basic
 # serial communication through a miniUSB port
 
 import serial
