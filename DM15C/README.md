@@ -23,7 +23,7 @@ What the script assumes
 Error control
 -------------
 
-* As we said before, the script will only accept valid SCI notation. The problem is that the DM-15C will still send FIXED notaton while entering digits, so until ENTER is pressed or a result is obtained, the serial connection keeps sending useless data. The script will check for this useless data and assign a predetermined number. You should customised this number so you can trust its telling nature. You can modify the script so it outputs text but then remember to change the float conversion procedure at the end.
+* As we said before, the script will only accept valid SCI notation. The problem is that the DM-15C will still send FIXED notaton while entering digits, so until ENTER is pressed or a result is obtained, the serial connection keeps sending useless data. The script will check for these useless data and assign a predetermined number. You should customise this number so you can trust its telling nature. You can modify the script so it outputs text but then remember to change the float conversion procedure at the end.
 
 * If the DM-15C shows any kind of error on the LCD, the script will just think is useless data and default to the predefined number.
 
