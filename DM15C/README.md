@@ -29,4 +29,4 @@ Error control
 
 * If the DM-15C shows a blinking number (i.e. you exceeded the calculator memory size for a number), the script will cleanly exit showing an error message.
 
-* If the DM-15C turns the LCD off for any reason (calculation time, battery saving), the script will just ignore this behaviour an wait for valid data.
+* If the DM-15C turns the LCD off for any reason (calculation time, battery saving), the script will just ignore this behaviour and wait for valid data.
