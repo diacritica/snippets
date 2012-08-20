@@ -16,7 +16,7 @@ What the script assumes
 
 * You have configured the serial connection as 38400,8n1 AND no software or hardware flow control. In Linux you can use minicom to achieve this.
 
-* You have configured your DM-15C to SCI notation, which takes the form of 1.23456e78. If you stick to FIXED or ENGINEER notation, the script won't work. The problem is that points and commas are sent to the serial connection as points but using SCI notation you only get one point, the one separating integer and decimal parts.
+* You have configured your DM-15C to SCI notation, which takes the form of 1.23456e78. If you stick to FIXED or ENGINEER notation, the script won't work.
 
 * You have permission to read from the serial port (typically /dev/ttyUSB0 in Linux, check for other OSes' equivalents)
 
