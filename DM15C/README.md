@@ -9,7 +9,7 @@ A typical serial output from the calculator looks like this:
     '|                                                        |                     \r\n'
     '|__                                                    __|\r\n'
 
-What the script basically does is read the three first lines and translate the ASCII segments into BCD coded numbers. It then correlates the BCD coded numbers into a float number asuming that the DM-15C is set to SCI numeric notation.
+What the script basically does is read the first three lines and translate the ASCII segments into BCD coded numbers. It then correlates the BCD coded numbers into a float number asuming that the DM-15C is set to SCI numeric notation.
 
 What the script assumes
 -----------------------
