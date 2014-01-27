@@ -1,25 +1,73 @@
 #!/usr/bin/env python
 
+import sys
+import argparse
+from configobj import ConfigObj
+from random import randint
 
 completedmission = {"MID":"MID1","DAY":1}
 
-SCALAR = [int(72 + i/2) for i in range(1,45)]
-SCALAR_CFP = [int(100 - i/3) for i in range(1,45)]
-SCALAR_NCFP = [int(80 + i/2) for i in range(1,45)]
-SCALAR_REP = [int(90 + i/3) for i in range(1,45)]
-SCALAR_AEP = [100 for i in range(1,45)]
+SCALAR = [int(72 + i/2) for i in range(1,47)]
+SCALAR_CFP = [int(100 - i/3) for i in range(1,47)]
+SCALAR_NCFP = [int(80 + i/2) for i in range(1,47)]
+SCALAR_REP = [int(90 + i/3) for i in range(1,47)]
+SCALAR_PE = [100 for i in range(1,47)]
 	  
 
 MAXNCFP = -30
+NCFPPEN = -3
 MAXCFP = 30
+CFPBON = 3
+CFPbon = 1
 MAXREP = 20
 MAXPE = 10
 BASELINE = 50
 
 # ASSOCIATED DAY, COMPLETED?, ON SCHEDULE?, no of REPS
 MISSIONS = {"MID"+str(i):{"EXPECTEDDAY":i,"COMPLETED":False,"ONSCHEDULE":False,"REPS":0} for i in range(1,45)}
-PERSONALELEMENTS = {"PE"+str(i):{"REPEATED":False} for i in range(5)}
+PERSONALELEMENTS = {"PE"+str(i):{"USED":False} for i in range(1,6)}
 
+
+class Simulator:
+
+    def __init__(self, configfile="marks.conf"):
+        self.configfile = configfile
+
+    def execute(self):
+
+        m = MARK(userid=randint(1,1000))
+        history = []
+        marksconfig = ConfigObj(self.configfile)
+
+        for s in marksconfig.sections:
+
+            print("\n--->"+s)
+            day = marksconfig[s]
+
+
+            for operation in day.sections:
+
+                params = list(day[operation].values())
+                print("We did",params)
+                op = getattr(m, operation)
+                for param in params:
+                    op(param)
+
+                #op = getattr(m, operation.replace("do","check"))
+                #op()
+
+
+            m.endDay()
+            m.newDay()
+            m.getEvaluation()
+            m.getNormEvaluation()
+            history.append(str(m.normevaluation))
+            print(m)
+
+        print(history)
+        f=open("results.csv","a")
+        f.write(",".join(history)+"\n")
+        f.close()
 
 class MARK:
 
@@ -33,91 +81,82 @@ class MARK:
         self.acummulatedPE = 0
         self.MISSIONS = MISSIONS
         self.PERSONALELEMENTS = PERSONALELEMENTS
-        self.lastdayrep = -1
+        self.lastdayrep = 45
         self.oldevaluation = 0
         self.evaluation = 0
+        self.normoldevaluation = 0
+        self.normevaluation = 0
 
     def login(self):
         pass
         
     def __str__(self):
         return """{0} - {1} - {2} \n
-{3}/{4}/{5}/{6}\n
-{7}""".format(self.userid,self.currentday,self.evaluation,self.acummulatedCFP,
+CFP {3}/ NCFP {4}/  REP{5}/ PE {6}/ NORM {7}""".format(self.userid,self.currentday,self.evaluation,self.acummulatedCFP,
                                             self.acummulatedNCFP,self.acummulatedREP,
-                                                self.acummulatedPE,"")
+                                                self.acummulatedPE,self.normevaluation)
         
     def endDay(self):
-        print("END DAY",self)
-        self.checkNCFP()
+        self.checkMission()
+        self.checkPE()
         
     def newDay(self):
-        print("NEW DAY")
         self.currentday += 1
 
-    def doMission(self, completedmission):
+    def doPE(self, personalelement):
+                      
+        self.PERSONALELEMENTS[personalelement]["USED"] = True
 
-        yumpmission = self.MISSIONS[completedmission["MID"]]
+    def checkPE(self):
+        self.acummulatedPE = (MAXPE/5) * sum([1 for PE in self.PERSONALELEMENTS.values() if PE["USED"]])
+
+    def doREP(self, repeatedmission):
+
+        self.doMission(repeatedmission)
+
+
+    def checkREP(self):
+
+        self.checkMission()
+
+    def doMission(self, mission):
+
+        yumpmission = self.MISSIONS[mission]
+        if not yumpmission["COMPLETED"]:
+            yumpmission["COMPLETED"] = True
         
         if yumpmission["EXPECTEDDAY"] == self.currentday:
-            yumpmission["ONSCHEDULE"] == True
+            yumpmission["ONSCHEDULE"] = True
 
-        if not yumpmission["COMPLETED"]:
-            yumpmission["COMPLETED"] == True
-            self.CFP()
+        yumpmission["REPS"] = yumpmission["REPS"] + 1
 
-
-        yumpmission["REPS"] == yumpmission["REPS"] + 1
         if yumpmission["REPS"] > 1:
-            self.REP()
-            
-
-    def checkNCFP(self):
-
-        acummulatedNCFP = sum([-1 for mission in self.MISSIONS.values() if mission[0] <= 1 and not mission[1]])
-        self.acummulatedNCFP =  max(MAXNCFP,acummulatedNCFP)
-        
-    
-        
-    def addToCFP(self, completedmission):
-
-        if self.MISSIONS[completedmission["MID"]][0] == self.currentday:
-            self.MISSIONS[completedmission["MID"]][2] = True            
+            self.lastdayrep = self.currentday
 
 
-        self.MISSIONS[completedmission["MID"]][1] = True
-        
-    def CFP(self):
-        
-        acummulatedCFP = sum([3 for mission in MISSIONS.values() if (mission[1] and mission[2])]) +\
-                 sum([1 for mission in self.MISSIONS.values() if (mission[1] and not mission[2])])
+    def checkMission(self):
+
+
+        acummulatedCFP = sum([CFPBON for mission in self.MISSIONS.values() if (mission["COMPLETED"] and mission["ONSCHEDULE"])]) +\
+                 sum([CFPbon for mission in self.MISSIONS.values() if (mission["COMPLETED"] and not mission["ONSCHEDULE"])])
 
         self.acummulatedCFP =  min(MAXCFP,acummulatedCFP)
 
-    def addMISSIONREP(self, repeatedmission):
+        acummulatedNCFP = sum([NCFPPEN for mission in self.MISSIONS.values() if mission["EXPECTEDDAY"] <= self.currentday and not mission["ONSCHEDULE"]])
 
-        self.MISSIONS[repeatedmission["MID"]][3] += 1
-        self.lastdayrep = self.currentday
+        self.acummulatedNCFP =  max(MAXNCFP,acummulatedNCFP)
 
-    def REP(self):
 
-        self.acummulatedREP = max(0, int(MAXREP * (1-(self.currentday-self.getDayLastRep())/self.currentday)))
+        self.acummulatedREP = max(0, int(MAXREP/(1+self.currentday-self.getDayLastRep())))
+
+
+
+
 
     def getDayLastRep(self):
                       
         return self.lastdayrep
             
-    def addPE(self, personalelement):
-                      
-        self.PERSONALELEMENTS[personalelement["PE"]][0] = True
-
-    def delPE(self, personalelement):
-
-        self.PERSONALELEMENTS[personalelement["PE"]][0] = False
-
-    def PE(self):
-        self.acummulatedPE = MAXPE * (1-(5-sum([1 for PE in self.PERSONALELEMENTS.values() if PE[0]])))
-
 
     def getEvaluation(self):
 
@@ -125,11 +164,29 @@ class MARK:
         evaluation = BASELINE + self.acummulatedCFP + self.acummulatedNCFP + self.acummulatedREP + self.acummulatedPE
         self.evaluation = evaluation
 
-        
-        
-        
+
+    def getNormEvaluation(self):
+
+        self.oldnormevaluation = self.normevaluation
+        normevaluation = BASELINE + self.acummulatedCFP*SCALAR_CFP[self.currentday]/100 + self.acummulatedNCFP*SCALAR_NCFP[self.currentday]/100 + self.acummulatedREP*SCALAR_REP[self.currentday]/100 + self.acummulatedPE*SCALAR_PE[self.currentday]/100
+        self.normevaluation = normevaluation
+
         
 if __name__=="__main__":
+
+    s = Simulator
+    parser = argparse.ArgumentParser(description='YUMP marks Simulator')
+
+    parser.add_argument('--configfile', default='marks.conf', help='Marks configuration file')
+    
+    args = vars(parser.parse_args())
+
+    s = Simulator(args['configfile'])
+    s.execute()
+
+    sys.exit(0)        
+        
+if __name__=="test":
 
     m = MARK(1)
     amission = {"MID":"MID1","DAY":1}
