@@ -3,7 +3,7 @@
 import sys
 import argparse
 from configobj import ConfigObj
-from random import randint,choice
+from random import randint, choice
 
 mode = "PASSIVE"
 
@@ -20,29 +20,29 @@ elif mode == "PASSIVE":
     n4 = 5
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
     config = ConfigObj()
     config.filename = "mytest.conf"
 
-    subsections = ["doMission","doREP","doPE"]
+    subsections = ["doMission", "doREP", "doPE"]
 
-    for i in range(1,45):
-        myday = "DAY "+str(i)
+    for i in range(1, 45):
+        myday = "DAY " + str(i)
         config[myday] = {}
-        for n in range(randint(1,n1)):
+        for n in range(randint(1, n1)):
             subsection = choice(subsections)
 
             if subsection == "doMission":
-                nomissions = randint(1,n2)
+                nomissions = randint(1, n2)
                 missions = []
                 for m in range(nomissions):
-                    options = range(1,i+1)+[i]*i
-                    print("OPTIONS->",options)
+                    options = list(range(1, i + 1)) + [i] * i
+                    print(('OPTIONS->', options))
                     mn = choice(options)
-                    mstr = "MID"+str(mn)
+                    mstr = "MID" + str(mn)
                     missions.append(mstr)
-                adict = {"doMission":{ "mission"+m:m for m in missions  }}
+                adict = {'doMission': {'mission' + m: m for m in missions}}
                 config["DAY "+str(i)].update(adict)
             elif subsection == "doREP":
                 nomissions = randint(1,n3)
@@ -61,5 +61,5 @@ if __name__=="__main__":
                     config["DAY "+str(i)].update(adict)
 
 
-    print(config)            
-    config.write()            
+    print(config)
+    config.write()
