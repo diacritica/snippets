@@ -43,23 +43,22 @@ if __name__ == "__main__":
                     mstr = "MID" + str(mn)
                     missions.append(mstr)
                 adict = {'doMission': {'mission' + m: m for m in missions}}
-                config["DAY "+str(i)].update(adict)
+                config["DAY " + str(i)].update(adict)
             elif subsection == "doREP":
-                nomissions = randint(1,n3)
+                nomissions = randint(1, n3)
                 missions = []
                 for m in range(nomissions):
-                    mn = choice(range(1,i+1))
-                    mstr = "MID"+str(mn)
+                    mn = choice(list(range(1, i + 1)))
+                    mstr = "MID" + str(mn)
                     missions.append(mstr)
-                adict = {"doREP":{ "rep"+m:m for m in missions  }}
-                config["DAY "+str(i)].update(adict)
+                adict = {"doREP": {"rep" + m: m for m in missions}}
+                config["DAY " + str(i)].update(adict)
 
             elif subsection == "doPE":
-                p = randint(1,100)
-                if p<n4:
-                    adict = {"doPE":{ "PE": "PE"+str(randint(1,5)) }}
-                    config["DAY "+str(i)].update(adict)
-
+                p = randint(1, 100)
+                if p < n4:
+                    adict = {"doPE": {"PE": "PE" + str(randint(1, 5))}}
+                    config["DAY " + str(i)].update(adict)
 
     print(config)
     config.write()
