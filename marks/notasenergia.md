@@ -11,7 +11,7 @@ Al mínimo se puede llegar simplemente ignorando la plataforma de forma sistemá
 
 **Cumplir el programa en fecha otorga bonus**: 3 puntos por mission ejecutada en fecha.
 
-**Cumplir el programa fuera de fecha otorga bonus**: 3 puntos por mision ejecutada fuera de fecha.
+**Cumplir el programa fuera de fecha otorga bonus**: 1 punto por mision ejecutada fuera de fecha.
 
 Ambos criterios tienen un máximo de bonificación en todo caso de 30 puntos.
 
